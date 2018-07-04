@@ -1,13 +1,13 @@
 <?php
 /**
- * yzmtpl.class.php  yzmtpl模板解析类
+ * yzm_tpl.class.php  yzm_tpl模板解析类
  *
  * @author           袁志蒙  
  * @license          http://www.yzmcms.com
  * @lastmodify       2017-03-13 
  */
 
-class yzmtpl {
+class yzm_tpl {
 	
     private $template_tag_left = '{';     //模板左标签
     private $template_tag_right = '}';    //模板右标签

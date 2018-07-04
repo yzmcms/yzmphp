@@ -1030,8 +1030,8 @@ function template($module = '', $template = 'index'){
 	}	
 	$template_c = $template_c.$template.'.tpl.php'; 		
 	if(!is_file($template_c) || filemtime($template_c) < filemtime($tplfile)) {
-		$yzmtpl = yzm_base::load_sys_class('yzmtpl');
-		$compile = $yzmtpl->tpl_replace(@file_get_contents($tplfile));
+		$yzm_tpl = yzm_base::load_sys_class('yzm_tpl');
+		$compile = $yzm_tpl->tpl_replace(@file_get_contents($tplfile));
 		file_put_contents($template_c, $compile);
 	}
 	return $template_c;
