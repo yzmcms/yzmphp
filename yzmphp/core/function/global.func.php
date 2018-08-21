@@ -1160,3 +1160,26 @@ function is_get(){
 function is_put(){
 	return 'PUT' == $_SERVER['REQUEST_METHOD'];
 }	
+
+
+/**
+ * 创建TOKEN，确保已经开启SESSION
+ * @param bool $isinput 是否返回input
+ * @return string
+ */
+function creat_token($isinput = true){
+	$_SESSION['token'] = create_randomstr(8);
+	return $isinput ? '<input type="hidden" name="token" value="'.$_SESSION['token'].'">' : $_SESSION['token'];
+}
+
+
+/**
+ * 验证TOKEN，确保已经开启SESSION
+ * @param string $token 
+ * @return bool
+ */
+function check_token($token){
+	if(!$token || !isset($_SESSION['token']) || $token!=$_SESSION['token']) return false;
+	unset($_SESSION['token']);
+	return true;
+}
