@@ -746,7 +746,7 @@ function to_sqls($data, $front = ' AND ', $in_column = false) {
 function set_cookie($name, $value = '', $time = 0) {
 	$time = $time > 0 ? SYS_TIME + $time : $time;
 	$name = C('cookie_pre').$name;
-	$value = is_array($value) ? 'in_yzmphp'.string_auth(json_encode($value)) : string_auth($value);
+	$value = is_array($value) ? 'in_yzmphp'.string_auth(json_encode($value),'ENCODE',md5(YZMPHP_PATH.C('db_pwd'))) : string_auth($value,'ENCODE',md5(YZMPHP_PATH.C('db_pwd')));
 	setcookie($name, $value, $time, C('cookie_path'), C('cookie_domain'), C('cookie_secure'));
 	$_COOKIE[$name] = $value;
 }
@@ -763,9 +763,9 @@ function get_cookie($name = '', $default = '') {
 	if(isset($_COOKIE[$name])){
 		if(strpos($_COOKIE[$name],'in_yzmphp')===0){
 			$_COOKIE[$name] = substr($_COOKIE[$name],9);
-			return json_decode(MAGIC_QUOTES_GPC?stripslashes(string_auth($_COOKIE[$name],'DECODE')):string_auth($_COOKIE[$name],'DECODE'), true);
+			return json_decode(MAGIC_QUOTES_GPC?stripslashes(string_auth($_COOKIE[$name],'DECODE',md5(YZMPHP_PATH.C('db_pwd')))):string_auth($_COOKIE[$name],'DECODE',md5(YZMPHP_PATH.C('db_pwd'))), true);
         }
-		return string_auth(safe_replace($_COOKIE[$name]),'DECODE');
+		return string_auth(safe_replace($_COOKIE[$name]),'DECODE',md5(YZMPHP_PATH.C('db_pwd')));
 	}else{
 		return $default;
 	}	
