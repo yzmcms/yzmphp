@@ -1,31 +1,25 @@
 {m:include "index","header"}
 <p style="font-size:16px;font-weight:blod;">欢迎使用YZMPHP框架{YZMPHP_VERSION}！返回首页：<a href="{U('init')}">INIT</a></p>
 
-<br>
+模板中PHP函数的实例：<br>
 现在时间：{date('Y-m-d H:i:s')}
 <br>
 <br>
-
-在来一个for循环玩玩：<br>
+模板中for循环实例：
 {for $i=0; $i<10; $i++}
-   {$i}<br>
+   {$i}
 {/for}
-<br>
 
+<br><br>
 <table border="1" align="center" width="90%" cellpadding="3" cellspacing="0">
 	<tr bgcolor="#cccccc">
 		<th>编号</th><th>姓名</th><th>性别</th><th>年龄</th><th>电子邮件</th>
 	</tr>
 	{loop $users $key=>$val}
-        {if $val['id']%2 ==0 }	
-		<tr bgcolor="#cccccc">	
-			<td> {$val['id']} </td><td> {$val['name']} </td><td> {$val['sex']} </td><td> {$val['age']} </td><td> {$val['email']} </td>
+		<!-- 模板中if判断语法 -->
+        <tr {if $val['id']%2 ==0}bgcolor="#cccccc"{/if}>	
+			<td> {$val[id]} </td><td> {$val[name]} </td><td> {$val[sex]} </td><td> {$val[age]} </td><td> {$val[email]} </td>
 		</tr>
-		{else}
-		<tr>	
-			<td> {$val['id']} </td><td> {$val['name']} </td><td> {$val['sex']} </td><td> {$val['age']} </td><td> {$val['email']} </td>
-		</tr>		
-		{/if}
 	{/loop}	
 </table>
 
