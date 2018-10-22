@@ -99,6 +99,8 @@ class debug {
 			$mess .= $exception->getMessage();
 			$mess .= '</span>'; 		
 			self::addmsg($mess);
+		}else{
+			error_log('<?php exit;?> ExceptionError : '.date('Y-m-d H:i:s').' | '.$exception->getMessage().' | '.$exception->getFile().' | '.$exception->getLine()."\r\n", 3, YZMPHP_PATH.'cache/error_log.php');
 		}
 		showmsg($exception->getMessage(), 'stop');
 	}

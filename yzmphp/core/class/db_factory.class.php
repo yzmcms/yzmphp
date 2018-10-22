@@ -34,6 +34,10 @@ class db_factory {
 					yzm_base::load_sys_class('db_mysqli','',0);
 					self::$class = 'db_mysqli';
 					break;
+				case 'pdo' : 
+					yzm_base::load_sys_class('db_pdo','',0);
+					self::$class = 'db_pdo';
+					break;
 				default :
 					yzm_base::load_sys_class('db_mysql','',0);
 					self::$class = 'db_mysql';
