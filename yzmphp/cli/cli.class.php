@@ -9,7 +9,7 @@
  
 class cli {
 	
-	public static $version = '1.0';
+	public static $version = '2.0';
 	
 	/**
 	 *  开始处理cli命令
