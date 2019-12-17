@@ -129,7 +129,7 @@ function safe_replace($string) {
  * 获取当前页面完整URL地址
  */
 function get_url() {
-	$sys_protocal = isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443' ? 'https://' : 'http://';
+	$sys_protocal = is_ssl() ? 'https://' : 'http://';
 	$php_self = $_SERVER['PHP_SELF'] ? safe_replace($_SERVER['PHP_SELF']) : safe_replace($_SERVER['SCRIPT_NAME']);
 	$path_info = isset($_SERVER['PATH_INFO']) ? safe_replace($_SERVER['PATH_INFO']) : '';
 	$relate_url = isset($_SERVER['REQUEST_URI']) ? safe_replace($_SERVER['REQUEST_URI']) : $php_self.(isset($_SERVER['QUERY_STRING']) ? '?'.safe_replace($_SERVER['QUERY_STRING']) : $path_info);
@@ -300,6 +300,35 @@ function array2string($data, $isformdata = 1) {
 		return addslashes(json_encode($data,JSON_FORCE_OBJECT));
 	}
 }
+
+
+/**
+ * 兼容低版本的array_column
+ * @param  $array      多维数组
+ * @param  $column_key 需要返回值的列
+ * @param  $index_key  可选。作为返回数组的索引/键的列。
+ * @return array       返回一个数组，数组的值为输入数组中某个单一列的值。
+ */
+function yzm_array_column($array, $column_key, $index_key = null){
+	if(function_exists('array_column')) return array_column($array, $column_key, $index_key);
+
+    $result = array();
+	foreach ($array as $key => $value) {
+		if(!is_array($value)) continue;
+        if($column_key){
+        	if(!isset($value[$column_key])) continue;
+        	$tmp = $value[$column_key];
+        }else{
+        	$tmp = $value;
+        }
+        if ($index_key) {
+        	$key = isset($value[$index_key]) ? $value[$index_key] : $key;
+        }
+        $result[$key] = $tmp;
+    }
+    return $result;
+}
+
 
 
 /**
@@ -502,20 +531,28 @@ function format_time($date = 0, $type = 1) { //$type = 1为时间戳格式，$ty
 
 /**
 * 转换字节数为其他单位
-* @param	string	$filesize	字节大小
+* @param	string	$size	字节大小
 * @return	string	返回大小
 */
-function sizecount($filesize) {
-	if ($filesize >= 1073741824) {
-		$filesize = round($filesize / 1073741824 * 100) / 100 .' GB';
-	} elseif ($filesize >= 1048576) {
-		$filesize = round($filesize / 1048576 * 100) / 100 .' MB';
-	} elseif($filesize >= 1024) {
-		$filesize = round($filesize / 1024 * 100) / 100 . ' KB';
-	} else {
-		$filesize = $filesize.' Bytes';
-	}
-	return $filesize;
+function sizecount($size) {
+    $kb = 1024;
+    $mb = 1024 * $kb;
+    $gb = 1024 * $mb;
+    $tb = 1024 * $gb;
+    $db = 1024 * $tb;
+    if ($size < $kb) {
+        return $size . " B";
+    } else if ($size < $mb) {
+        return round($size / $kb, 2) . " KB";
+    } else if ($size < $gb) {
+        return round($size / $mb, 2) . " MB";
+    } else if ($size < $tb) {
+        return round($size / $gb, 2) . " GB";
+    } else if ($size < $db) {
+        return round($size / $tb, 2) . " TB";
+    } else {
+        return round($size / $db, 2) . " STB";
+    }
 }
 
 
@@ -1054,6 +1091,70 @@ function showmsg($msg, $gourl = '', $limittime = 3){
 		debug::message();
 	}
 	exit;
+}
+
+
+/**
+ * 发送HTTP状态
+ * @param integer $code 状态码
+ * @return void
+ */
+function send_http_status($code){
+    static $_status = array(
+            // Informational 1xx
+            100 => 'Continue',
+            101 => 'Switching Protocols',
+            // Success 2xx
+            200 => 'OK',
+            201 => 'Created',
+            202 => 'Accepted',
+            203 => 'Non-Authoritative Information',
+            204 => 'No Content',
+            205 => 'Reset Content',
+            206 => 'Partial Content',
+            // Redirection 3xx
+            300 => 'Multiple Choices',
+            301 => 'Moved Permanently',
+            302 => 'Moved Temporarily ',  // 1.1
+            303 => 'See Other',
+            304 => 'Not Modified',
+            305 => 'Use Proxy',
+            // 306 is deprecated but reserved
+            307 => 'Temporary Redirect',
+            // Client Error 4xx
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            402 => 'Payment Required',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            406 => 'Not Acceptable',
+            407 => 'Proxy Authentication Required',
+            408 => 'Request Timeout',
+            409 => 'Conflict',
+            410 => 'Gone',
+            411 => 'Length Required',
+            412 => 'Precondition Failed',
+            413 => 'Request Entity Too Large',
+            414 => 'Request-URI Too Long',
+            415 => 'Unsupported Media Type',
+            416 => 'Requested Range Not Satisfiable',
+            417 => 'Expectation Failed',
+            // Server Error 5xx
+            500 => 'Internal Server Error',
+            501 => 'Not Implemented',
+            502 => 'Bad Gateway',
+            503 => 'Service Unavailable',
+            504 => 'Gateway Timeout',
+            505 => 'HTTP Version Not Supported',
+            509 => 'Bandwidth Limit Exceeded',
+            550 => 'Can not connect to MySQL server'
+    );
+    if(isset($_status[$code])) {
+        header('HTTP/1.1 '.$code.' '.$_status[$code]);
+        // 确保FastCGI模式下正常
+        header('Status:'.$code.' '.$_status[$code]);
+    }
 }	
 
 
@@ -1133,6 +1234,20 @@ function input($key = '', $default = '', $function = ''){
 	} else {
 		return false;
 	}
+}
+
+
+/**
+ * 判断是否SSL协议
+ * @return boolean
+ */
+function is_ssl() {
+    if(isset($_SERVER['HTTPS']) && ('1' == $_SERVER['HTTPS'] || 'on' == strtolower($_SERVER['HTTPS']))){
+        return true;
+    }elseif(isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'] )) {
+        return true;
+    }
+    return false;
 }
 
 
