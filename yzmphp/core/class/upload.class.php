@@ -11,7 +11,7 @@ class upload {
 	
 	private $filepath = './uploads/';     //指定上传文件保存的路径
 	private $allowtype = array('gif', 'jpg', 'png', 'jpeg');  //充许上传文件的类型
-	private $maxsize = 2048000;  //允上传文件的最大值 2M
+	private $maxsize = 2097152;  //允上传文件的最大值 2M
 	private $israndname = true;  //是否随机重命名， true随机， false不随机，使用原文件名
 	private $originname;   //源文件名称
 	private $tmpfilename;  //临时文件名
@@ -38,6 +38,7 @@ class upload {
 			$this->setoption($key, $val);
 		}
 		$this->setoption('filepath', YZMPHP_PATH.C('upload_file').'/'.date('Ym/d'));
+		$this->setoption('maxsize', get_config('upload_maxsize')*1024);
 	}
 
 
@@ -234,7 +235,7 @@ class upload {
 	 */
 	public function getnewfilename($file_path = true){
 		if($file_path)
-			return SITE_URL.C('upload_file').'/'.date('Ym/d/').$this->newfilename;
+			return SITE_PATH.C('upload_file').'/'.date('Ym/d/').$this->newfilename;
 		else
 			return $this->newfilename;
 	}

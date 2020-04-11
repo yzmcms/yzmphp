@@ -11,9 +11,9 @@
 header('Content-Type:text/html;charset=utf-8');  
 
 //设置时区（中国）
-date_default_timezone_set('PRC'); 
+date_default_timezone_set('PRC');    		   
 
-defined('YZMPHP_PATH') or exit('Access Denied.');    		   
+defined('YZMPHP_PATH') or exit('Access Denied.'); 
 
 define('IN_YZMPHP', true);
 
@@ -29,8 +29,11 @@ define('SYS_START_TIME', microtime(true));
 //系统时间
 define('SYS_TIME', time());
 
+//加载全局函数库
+yzm_base::load_sys_func('global');
+
 //主机协议
-define('SERVER_PORT', isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443' ? 'https://' : 'http://');
+define('SERVER_PORT', is_ssl() ? 'https://' : 'http://');
 //当前访问的主机名
 define('HTTP_HOST', (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : ''));
 //来源
@@ -63,9 +66,9 @@ if(version_compare(PHP_VERSION,'5.4.0','<')) {
     define('MAGIC_QUOTES_GPC', false);
 }
 
-//加载公用函数库
-yzm_base::load_sys_func('global');
+//加载公用文件
 yzm_base::load_common('function/extention.func.php');
+defined('YZMCMS_SOFTNAME') or define('YZMCMS_SOFTNAME', base64_decode('WXptQ01T5YaF5a65566h55CG57O757uf'));
 
 class yzm_base {
 		
@@ -100,7 +103,7 @@ class yzm_base {
 
 		$key = md5($path.$classname);
 		if (isset($classes[$key])) {
-			return !empty($classes[$key]) ? $classes[$key] : true;
+			return $initialize&&!is_object($classes[$key]) ? new $classname : $classes[$key];
 		}
 		if (!is_file($path.DIRECTORY_SEPARATOR.$classname.EXT)) {
 			debug::addmsg($path.DIRECTORY_SEPARATOR.$classname.EXT.L('does_not_exist'));

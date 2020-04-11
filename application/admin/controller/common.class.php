@@ -27,4 +27,3 @@ class common{
 		return APP_PATH.$m.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.$file.'.html';
 	}	
 }
-?>
