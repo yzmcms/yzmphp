@@ -20,7 +20,7 @@ define('IN_YZMPHP', true);
 //YZMPHP框架路径
 define('YP_PATH', dirname(__FILE__).DIRECTORY_SEPARATOR);
 //YZMPHP框架版本信息
-define('YZMPHP_VERSION', '2.0');
+define('YZMPHP_VERSION', '2.1');
 //YZMPHP应用目录
 define('APP_PATH', YZMPHP_PATH.'application'.DIRECTORY_SEPARATOR);
 
@@ -68,7 +68,6 @@ if(version_compare(PHP_VERSION,'5.4.0','<')) {
 
 //加载公用文件
 yzm_base::load_common('function/extention.func.php');
-defined('YZMCMS_SOFTNAME') or define('YZMCMS_SOFTNAME', base64_decode('WXptQ01T5YaF5a65566h55CG57O757uf'));
 
 class yzm_base {
 		

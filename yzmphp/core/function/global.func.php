@@ -305,8 +305,8 @@ function string2array($data) {
 	if($data == '') return array();
 	
 	if(strpos($data, '{\\')===0) $data = stripslashes($data);
-	$array=json_decode($data,true);
-	return $array;
+	$array = json_decode($data, true);
+	return is_array($array) ? $array : array();
 }
 
 
@@ -321,10 +321,10 @@ function array2string($data, $isformdata = 1) {
 	if($data == '' || empty($data)) return '';
 	
 	if($isformdata) $data = new_stripslashes($data);
-	if (version_compare(PHP_VERSION,'5.3.0','<')){
+	if (version_compare(PHP_VERSION,'5.4.0','<')){
 		return addslashes(json_encode($data));
 	}else{
-		return addslashes(json_encode($data,JSON_FORCE_OBJECT));
+		return json_encode($data, JSON_UNESCAPED_UNICODE|JSON_FORCE_OBJECT);
 	}
 }
 
@@ -504,43 +504,22 @@ function file_down($filepath, $filename = '') {
 
 /**
 * 传入日期格式或时间戳格式时间，返回与当前时间的差距，如1分钟前，2小时前，5月前，3年前等
-* @param string or int $date 分两种日期格式"2015-09-12 14:16:12"或时间戳格式"1386743303"
-* @param int $type
+* @param $date 分两种日期格式"2015-09-12 14:16:12"或时间戳格式"1386743303"
+* @param int $type 1为时间戳格式，$type = 2为date时间格式
 * @return string
 */
-function format_time($date = 0, $type = 1) { //$type = 1为时间戳格式，$type = 2为date时间格式
-    switch ($type) {
-        case 1:
-            //$data时间戳格式
-            $second = SYS_TIME - $date;
-            $minute = floor($second / 60) ? floor($second / 60) : 1; 
-            if ($minute >= 60 && $minute < (60 * 24)) { 
-                $hour = floor($minute / 60); 
-            } elseif ($minute >= (60 * 24) && $minute < (60 * 24 * 30)) { 
-                $day = floor($minute / ( 60 * 24)); 
-            } elseif ($minute >= (60 * 24 * 30) && $minute < (60 * 24 * 365)) { 
-                $month = floor($minute / (60 * 24 * 30));
-            } elseif ($minute >= (60 * 24 * 365)) { 
-                $year = floor($minute / (60 * 24 * 365)); 
-            }
-            break;
-            case 2:
-            //$date为字符串格式 2013-06-06 19:16:12
-            $date = strtotime($date);
-            $second = SYS_TIME - $date;
-            $minute = floor($second / 60) ? floor($second / 60) : 1; 
-            if ($minute >= 60 && $minute < (60 * 24)) { 
-                $hour = floor($minute / 60); 
-            } elseif ($minute >= (60 * 24) && $minute < (60 * 24 * 30)) { 
-                $day = floor($minute / ( 60 * 24)); 
-            } elseif ($minute >= (60 * 24 * 30) && $minute < (60 * 24 * 365)) { 
-               $mont = floor($minute / (60 * 24 * 30)); 
-            } elseif ($minute >= (60 * 24 * 365)) { 
-               $year = floor($minute / (60 * 24 * 365)); 
-            }
-            break;
-            default:
-            break;
+function format_time($date = 0, $type = 1) {
+	if($type == 2) $date = strtotime($date);
+    $second = SYS_TIME - $date;
+    $minute = floor($second / 60) ? floor($second / 60) : 1; 
+    if ($minute >= 60 && $minute < (60 * 24)) { 
+        $hour = floor($minute / 60); 
+    } elseif ($minute >= (60 * 24) && $minute < (60 * 24 * 30)) { 
+        $day = floor($minute / ( 60 * 24)); 
+    } elseif ($minute >= (60 * 24 * 30) && $minute < (60 * 24 * 365)) { 
+        $month = floor($minute / (60 * 24 * 30));
+    } elseif ($minute >= (60 * 24 * 365)) { 
+        $year = floor($minute / (60 * 24 * 365)); 
     }
     if (isset($year)) {
         return $year . '年前';
@@ -553,7 +532,7 @@ function format_time($date = 0, $type = 1) { //$type = 1为时间戳格式，$ty
     } elseif (isset($minute)) {
         return $minute . '分钟前';
     }
-}	
+}		
 
 
 /**
@@ -685,7 +664,7 @@ function grab_image($content, $targeturl = ''){
 	
 	if($img_array) {
 		$path =  C('upload_file').'/'.date('Ym/d');
-		$urlpath = SITE_URL.$path;
+		$urlpath = SITE_PATH.$path;
 		$imgpath =  YZMPHP_PATH.$path;
 		if(!is_dir($imgpath)) @mkdir($imgpath, 0777, true);
 	}
@@ -806,16 +785,28 @@ function to_sqls($data, $front = ' AND ', $in_column = false) {
 
 
 /**
+ * 以httponly方式开启SESSION
+ * @return boolean
+ */
+function new_session_start(){
+	ini_set('session.cookie_httponly', true);
+	return session_start();
+}
+
+
+/**
  * 设置 cookie
  * @param string $name     变量名
  * @param string $value    变量值
  * @param int $time    过期时间
+ * @param boolean $httponly  
  */
-function set_cookie($name, $value = '', $time = 0) {
+function set_cookie($name, $value = '', $time = 0, $httponly = false) {
 	$time = $time > 0 ? SYS_TIME + $time : $time;
 	$name = C('cookie_pre').$name;
 	$value = is_array($value) ? 'in_yzmphp'.string_auth(json_encode($value),'ENCODE',md5(YZMPHP_PATH.C('db_pwd'))) : string_auth($value,'ENCODE',md5(YZMPHP_PATH.C('db_pwd')));
-	setcookie($name, $value, $time, C('cookie_path'), C('cookie_domain'), C('cookie_secure'));
+	$httponly = $httponly ? $httponly : C('cookie_httponly');
+	setcookie($name, $value, $time, C('cookie_path'), C('cookie_domain'), C('cookie_secure'), $httponly);
 	$_COOKIE[$name] = $value;
 }
 
@@ -847,13 +838,13 @@ function get_cookie($name = '', $default = '') {
 function del_cookie($name = '') {	
 	if(!$name){
 		foreach($_COOKIE as $key => $val) { 
-			setcookie($key, '', SYS_TIME - 3600, C('cookie_path'), C('cookie_domain'), C('cookie_secure'));
+			setcookie($key, '', SYS_TIME - 3600, C('cookie_path'), C('cookie_domain'), C('cookie_secure'), C('cookie_httponly'));
 			unset($_COOKIE[$key]);
 		}		
 	}else{
 		$name = C('cookie_pre').$name;
 		if(!isset($_COOKIE[$name])) return true;
-		setcookie($name, '', SYS_TIME - 3600, C('cookie_path'), C('cookie_domain'), C('cookie_secure'));
+		setcookie($name, '', SYS_TIME - 3600, C('cookie_path'), C('cookie_domain'), C('cookie_secure'), C('cookie_httponly'));
 		unset($_COOKIE[$name]);
 	}
 }
@@ -1091,7 +1082,8 @@ function template($module = '', $template = 'index'){
     $filename = $template.'.html';
 	$tplfile = $template_path.$filename;   
 	if(!is_file($tplfile)) {
-		showmsg(str_replace(YZMPHP_PATH, '', $tplfile).L('template_does_not_exist'),'stop');			                      
+		$template = APP_DEBUG ? str_replace(YZMPHP_PATH, '', $tplfile) : basename($tplfile);
+		showmsg($template.L('template_does_not_exist'), 'stop');			                      
 	}	
 	if(!is_dir(YZMPHP_PATH.'cache'.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR)){
 		@mkdir(YZMPHP_PATH.'cache'.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR, 0777, true);

@@ -12,8 +12,9 @@ class param {
 	private $route_config = '';  //路由配置
 	
 	public function __construct() {
-		$this->route_config = C('route');
-		if(URL_MODEL != 0){
+		$route_config = C('route_config');
+		$this->route_config = isset($route_config[HTTP_HOST]) ? $route_config[HTTP_HOST] : $route_config['default'];
+		if(URL_MODEL){
 			if(C('set_pathinfo')) $this->set_pathinfo();
 			$this->pathinfo_url();
 		}
