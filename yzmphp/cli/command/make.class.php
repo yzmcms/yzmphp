@@ -1,15 +1,15 @@
 <?php
 /**
- * make.class.php make命令处理
+ * make命令处理
  * @author           袁志蒙  
  * @license          http://www.yzmcms.com
- * @lastmodify       2018-04-18
+ * @lastmodify       2018-08-18
  *
  * 	使用说明：
- * 	php yzm make module test  ---创建一个test模块
- * 	php yzm make module test test ---创建一个test模块的同时并在该模块下创建一下test控制器
- * 	php yzm make controller test mytest ---在test模块下创建一个mytest的控制器
- * 	php yzm make model test mytest ---在test模块下创建一个mytest的模型
+ * 	php yzm make module test  ---创建test模块
+ * 	php yzm make module test test ---创建test模块的同时并在该模块下创建test控制器
+ * 	php yzm make controller test mytest ---在test模块下创建mytest的控制器
+ * 	php yzm make model test mytest ---在test模块下创建mytest的模型
  *
  */
 
@@ -17,22 +17,20 @@ defined('IN_YZMPHP') or exit('Access Denied');
 class make extends cli{
 
 	/**
-	 *  执行命令方法-每个命令类必须存在
-	 *
-	 * @param     array  $parameter
+	 * 命令行默认执行的方法
 	 * @return    void
 	 */
-	public static function exec($parameter) {
-		$method = $parameter[0];
-		if(!method_exists(__CLASS__, $method)) self::halt('method does not exist.');
-		self::$method($parameter);
+	public function init() {
+
 	}
 	
 
     /**
      * 创建模块
      */	
-	public static function module($parameter) {
+	public function module() {
+
+		$parameter = self::$parameter;
 		$module = $parameter[1];
 		if(is_dir(APP_PATH.$module)) self::halt($module.' module already existed.');
 		$r = @mkdir(APP_PATH.$module, 0755);
@@ -57,8 +55,9 @@ class make extends cli{
     /**
      * 创建控制器
      */		
-	public static function controller($parameter) {
+	public function controller() {
 		
+		$parameter = self::$parameter;
 		if(!isset($parameter[1])) self::halt('module can\'t be empty.');
 		if(!isset($parameter[2])) self::halt('controller can\'t be empty.');
 		if(!is_dir(APP_PATH.$parameter[1].DIRECTORY_SEPARATOR.'controller')) self::halt($parameter[1].' module not existent.');		
@@ -76,7 +75,9 @@ class make extends cli{
     /**
      * 创建模型
      */		
-	public static function model($parameter) {
+	public function model() {
+
+		$parameter = self::$parameter;
 		if(!isset($parameter[1])) self::halt('module can\'t be empty.');
 		if(!isset($parameter[2])) self::halt('model can\'t be empty.');
 		if(!is_dir(APP_PATH.$parameter[1].DIRECTORY_SEPARATOR.'model')) self::halt($parameter[1].' module not existent.');

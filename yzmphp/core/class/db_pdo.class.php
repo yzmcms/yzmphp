@@ -242,11 +242,11 @@ class db_pdo{
 	 * @return int/boolean  成功：返回首个自动增长的ID，失败：false
 	 */
 	public function insert_all($datas, $filter = false, $replace = false){
-		if(!is_array($datas) || empty($datas[0])) {
+		if(!is_array($datas) || !current($datas)) {
 		    $this->geterr('insert all function First parameter Must be array!'); 
 			return false;
 		}
-		$fields = array_keys($datas[0]);
+		$fields = array_keys(current($datas));
 		$values = array();
 		foreach ($datas as $data){
 			$value = array();
@@ -377,7 +377,7 @@ class db_pdo{
 		$sql = 'SELECT '.$field.' FROM '.$this->get_tablename().$join.$where.$group.$having.$order.$limit;
 		$findquery = $this->execute($sql);
 		$data = $findquery->fetch(PDO::FETCH_NUM);
-	    return $data ? $data[0] : '';
+	    return $data[0] ? $data[0] : '';
 	}	
 	
 		

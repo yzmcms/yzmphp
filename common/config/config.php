@@ -12,7 +12,7 @@ return array(
     //数据库配置
     'db_type'            => 'pdo',             // 数据库链接扩展 , 支持 pdo | mysqli | mysql
     'db_host'            => '127.0.0.1',       // 服务器地址
-    'db_name'            => 'yzmphp',          // 数据库名
+    'db_name'            => 'yzmcms',          // 数据库名
     'db_user'            => 'root',            // 用户名
     'db_pwd'             => '123456',          // 密码
     'db_port'            => 3306,              // 端口
