@@ -55,9 +55,9 @@ class page{
 	 */
     private function make_url($page){
     	// 兼容PHP5.2写法，已不推荐
-    	// if($page == 1) return substr($this->url, 0, strpos($this->url, $this->page_prefix.'_PAGE'));
+    	// if($page == 1 && $this->url_rule) return substr($this->url, 0, strpos($this->url, $this->page_prefix.'_PAGE'));
 
-    	if($page == 1) return strstr($this->url, $this->page_prefix.'_PAGE', true);
+    	if($page == 1 && $this->url_rule) return strstr($this->url, $this->page_prefix.'_PAGE', true);
         return str_replace('PAGE', $page, $this->url);
     }
 

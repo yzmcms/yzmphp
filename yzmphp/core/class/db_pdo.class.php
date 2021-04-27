@@ -377,13 +377,13 @@ class db_pdo{
 		$sql = 'SELECT '.$field.' FROM '.$this->get_tablename().$join.$where.$group.$having.$order.$limit;
 		$findquery = $this->execute($sql);
 		$data = $findquery->fetch(PDO::FETCH_NUM);
-	    return $data[0] ? $data[0] : '';
+	    return $data ? $data[0] : '';
 	}	
 	
 		
 		
 	/**
-	 * 链接查询
+	 * 连接查询
 	 * @param $join 	string SQL语句，如yzmcms_admin ON yzmcms_admintype.id=yzmcms_admin.id
 	 * @param $type 	可选参数,默认是inner
 	 * @return object

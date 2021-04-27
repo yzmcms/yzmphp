@@ -107,6 +107,7 @@ class cli {
 	 */
 	protected static function halt($msg) {
 		fwrite(STDERR, self::output('Error: '.$msg, 'white', 'red'));
+		write_log('Cli Error: '.$msg);
 		exit();
 	}
 
