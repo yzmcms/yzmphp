@@ -1,5 +1,5 @@
 # YZMPHP
-YZMPHP V2.6 - 轻量级开源PHP框架
+YZMPHP V2.7 - 轻量级开源PHP框架
 
 支持PHP5.2~PHP8.0，推荐PHP7、PHP8。
 

@@ -48,7 +48,8 @@ class db_pdo{
 			return self::$link;
 		}catch(PDOException $e) {
 			self::$link = null;
-			application::halt("Can not connect to MySQL server!", 550);
+			$mysql_error = APP_DEBUG ? $e->getMessage() : 'Can not connect to MySQL server!';
+			application::halt($mysql_error, 550);
 		}		
 	}
 	
@@ -447,9 +448,10 @@ class db_pdo{
 	 */		
 	private function geterr($msg, $sql=''){
 		if(APP_DEBUG){
+			if(PHP_SAPI == 'cli') exit('MySQL Error: '.$msg.' | '.$sql);
 			application::fatalerror($msg, $sql, 2);	
 		}else{
-			error_log('<?php exit;?> MySQL Error: '.date('Y-m-d H:i:s').' | Error: '.$msg.' | SQL: '.$sql."\r\n", 3, YZMPHP_PATH.'cache/error_log.php');
+			write_error_log(array('MySQL Error', $msg, $sql));
 			application::halt('MySQL Error!', 500);
 			exit;
 		}

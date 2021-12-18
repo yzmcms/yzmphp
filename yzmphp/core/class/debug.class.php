@@ -14,13 +14,13 @@ class debug {
 	public static $request = array();
 	public static $stoptime; 
 	public static $msg = array(
-						E_WARNING => '错误警告',
-						E_NOTICE => '错误通知',
-						E_USER_ERROR => '自定义错误',
-						E_USER_WARNING => '自定义警告',
-						E_USER_NOTICE => '自定义通知',
-						E_STRICT => '编码标准化警告',
-						E_DEPRECATED => '已弃用警告',
+						2 => '错误警告',
+						8 => '错误通知',
+						256 => '自定义错误',
+						512 => '自定义警告',
+						1024 => '自定义通知',
+						2048 => '编码标准化警告',
+						8192 => '已弃用警告',
 						'Unknown' => '未知错误'
 					);
 	
@@ -61,7 +61,7 @@ class debug {
 			self::addmsg($mess);			
 		}else{
 			if($errno == E_NOTICE) return '';
-			error_log('<?php exit;?> Error : '.date('Y-m-d H:i:s').' | '.$errno.' | '.str_pad($errstr,30).' | '.$errfile.' | '.$errline."\r\n", 3, YZMPHP_PATH.'cache/error_log.php');
+			write_error_log(array('Error', $errno, $errstr, $errfile, $errline));
 		}
 	}
 
@@ -81,7 +81,7 @@ class debug {
                 if(APP_DEBUG && !defined('DEBUG_HIDDEN')){
                 	application::fatalerror($e['message'], $e['file'].' on line '.$e['line'], 1);	
            		}else{
-           			error_log('<?php exit;?> FatalError : '.date('Y-m-d H:i:s').' message:'.$e['message'].', file:'.$e['file'].', line:'.$e['line']."\r\n", 3, YZMPHP_PATH.'cache/error_log.php');
+           			write_error_log(array('FatalError', $e['message'], $e['file'], $e['line']));
            			application::halt('error message has been saved.', 500);
            		}
                 break;
@@ -102,7 +102,7 @@ class debug {
 			$mess .= '</span>'; 		
 			self::addmsg($mess);
 		}else{
-			error_log('<?php exit;?> ExceptionError : '.date('Y-m-d H:i:s').' | '.$exception->getMessage().' | '.$exception->getFile().' | '.$exception->getLine()."\r\n", 3, YZMPHP_PATH.'cache/error_log.php');
+			write_error_log(array('ExceptionError', $exception->getMessage(), $exception->getFile(), $exception->getLine()));
 		}
 		showmsg($exception->getMessage(), 'stop');
 	}

@@ -5,6 +5,7 @@ return array(
     //系统配置
     'auth_key'           => 'TEZTYUQ0N1BZVmGCW4BeFSrmLsoq8ENh',    //系统密钥
     'error_page'         => '404.html',    //错误提示页面，非调试模式有效
+    'error_log_save'     => true,          //是否保存系统错误日志，非调试模式有效
     'site_theme'         => 'default',     //站点默认主题目录
     'url_html_suffix'    => '.html',       //URL伪静态后缀
     'set_pathinfo'       => false,         //Nginx默认不支持PATHINFO模式，需配置此项为true，则Nginx可支持PATHINFO，系统默认为false
@@ -12,7 +13,7 @@ return array(
     //数据库配置
     'db_type'            => 'pdo',             // 数据库链接扩展 , 支持 pdo | mysqli | mysql
     'db_host'            => '127.0.0.1',       // 服务器地址
-    'db_name'            => 'yzmcms',          // 数据库名
+    'db_name'            => 'yzmphp',          // 数据库名
     'db_user'            => 'root',            // 用户名
     'db_pwd'             => '123456',          // 密码
     'db_port'            => 3306,              // 端口
@@ -38,7 +39,7 @@ return array(
     'cache_type'         => 'file',         // 缓存类型【暂支持 file , redis , memcache 】
     //缓存类型为file缓存时的配置项
     'file_config'        => array (
-        'cache_dir'      => YZMPHP_PATH.'cache/chche_file/',    //缓存文件目录
+        'cache_dir'      => YZMPHP_PATH.'cache/cache_file/',    //缓存文件目录
         'suffix'         => '.cache.php',  //缓存文件后缀
         'mode'           => '2',           //缓存格式：mode 1 为serialize序列化, mode 2 为保存为可执行文件array
     ), 
