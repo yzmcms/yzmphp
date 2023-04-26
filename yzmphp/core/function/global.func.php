@@ -132,7 +132,7 @@ function remove_xss($string) {
 			$pattern .= $parm[$i][$j]; 
 		}
 		$pattern .= '/i';
-		$string = preg_replace($pattern, ' ', $string); 
+		$string = preg_replace($pattern, 'xxx', $string); 
 	}
 	return $string;
 }	
@@ -304,7 +304,7 @@ function new_stripslashes($string) {
 function new_html_special_chars($string, $filter = array()) {
 	if(!is_array($string)) return htmlspecialchars($string,ENT_QUOTES,'utf-8');
 	foreach($string as $key => $val){
-		$string[$key] = $filter&&in_array($key, $filter) ? $val : new_html_special_chars($val);
+		$string[$key] = $filter&&in_array($key, $filter) ? $val : new_html_special_chars($val, $filter);
 	}
 	return $string;
 }
@@ -604,6 +604,7 @@ function format_time($date = 0, $type = 1) {
  * @return string	返回大小
  */
 function sizecount($size, $prec = 2) {
+	$size = intval($size);
 	$arr = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');
 	$pos = 0;
 	while ($size >= 1024) {
@@ -724,13 +725,16 @@ function grab_image($content, $targeturl = ''){
 	foreach($img_array as $value){
 		$val = $value;		
 		if(strpos($value, 'http') === false){
-			if(!$targeturl) return $content;
+			if(!$targeturl) continue;
 			$value = $targeturl.$value;
 		}	
 		if(strpos($value, '?')){ 
 			$value = explode('?', $value);
 			$value = $value[0];
-		}	
+		}
+		if(substr($value, 0, 4) != 'http'){
+			continue;
+		}
 		$ext = fileext($value);
 		if(!is_img($ext)) continue;
 		$imgname = date('YmdHis').rand(100,999).'.'.$ext;
@@ -738,15 +742,13 @@ function grab_image($content, $targeturl = ''){
 		$urlname = $urlpath.'/'.$imgname;
 		
 		ob_start();
-		readfile($value);
+		@readfile($value);
 		$data = ob_get_contents();
 		ob_end_clean();
 		$data && file_put_contents($filename, $data);
 	 
 		if(is_file($filename)){                         
 			$content = str_replace($val, $urlname, $content);
-		}else{
-			return $content;
 		}
 	}
 	return $content;        
@@ -1307,7 +1309,7 @@ function write_log($message, $filename = '', $ext = '.log', $path = '') {
  * @return bool
  */
 function write_error_log($err_arr, $path = '') {
-	if(!C('error_log_save')) return false;
+	if(!C('error_log_save') || defined('CLOSE_WRITE_LOG')) return false;
 	$err_arr = is_array($err_arr) ? $err_arr : array($err_arr);
 	$message[] = date('Y-m-d H:i:s');
 	$message[] = get_url();
@@ -1398,7 +1400,13 @@ function input($key = '', $default = '', $function = ''){
 function is_ssl() {
     if(isset($_SERVER['HTTPS']) && ('1' == $_SERVER['HTTPS'] || 'on' == strtolower($_SERVER['HTTPS']))){
         return true;
-    }elseif(isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'] )) {
+    }elseif(isset($_SERVER['SERVER_PORT']) && ('443' == $_SERVER['SERVER_PORT'])) {
+        return true;
+    }elseif(isset($_SERVER['REQUEST_SCHEME']) && ('https' == strtolower($_SERVER['REQUEST_SCHEME']))) {
+        return true;
+    }elseif(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && ('https' == strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']))) {
+        return true;
+    }elseif(isset($_SERVER['HTTP_X_FORWARDED_SCHEME']) && ('https' == strtolower($_SERVER['HTTP_X_FORWARDED_SCHEME']))) {
         return true;
     }
     return false;
