@@ -120,10 +120,31 @@ class cli {
 	 * @param  integer $newline 
 	 */
 	protected static function write($msg, $color='', $empty=0, $newline=1) {
-		$str = str_repeat(' ', $empty).$msg;
+		$str = $empty ? str_repeat(' ', $empty).$msg : $msg;
 		if($color) $str = self::output($str, $color);
 		if($newline) $str .= PHP_EOL;
 		fwrite(STDOUT, $str);
+	}
+
+
+
+	/**
+	 * 输出进度条
+	 * @param  float $percentage  当前进度[0-1之间的小数]
+	 * @param  string $color      进度条颜色
+	 * @return string             进度条
+	 */
+	public static function progress($percentage, $color='green'){
+	    $percent = floatval($percentage)*100 . '%';
+	    $barLength = intval($percentage * 50);
+	
+	    $bar = '[' . str_repeat('=', $barLength) . str_repeat(' ', 50 - $barLength) . ']';
+	    
+	    fwrite(STDOUT, "\033[?25l");
+	    fwrite(STDERR, self::output($bar . ' ' . $percent."\r", $color));
+	    if($percentage>=1){
+	        fwrite(STDOUT, PHP_EOL."\033[?25h");
+	    }
 	}
 
 
