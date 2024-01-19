@@ -44,6 +44,7 @@ class cli {
 		$command = isset($cli[0]) ? $cli[0] : 'help';
 		$commands = self::get_command();
 		if(!isset($commands[$command])) self::halt($command.' command Not existent.');
+		self::set_error_handler();
 		self::check_command($command);
 		self::exec($command, $cli);
 	}	
@@ -107,7 +108,6 @@ class cli {
 	 */
 	protected static function halt($msg) {
 		fwrite(STDERR, self::output('Error: '.$msg, 'white', 'red'));
-		write_log('Cli Error: '.$msg);
 		exit();
 	}
 
@@ -176,6 +176,18 @@ class cli {
 		require(CLI_PATH.'command'.DIRECTORY_SEPARATOR.$command.EXT);
 		if(!class_exists($command)) self::halt($command.' class does not exist.');
 		return true;
+	}
+
+
+	/**
+	 * 设置错误处理方式
+	 *
+	 * @return    void
+	 */
+	private static function set_error_handler() {
+		set_error_handler(function ($severity, $message, $file, $line) {
+		    throw new ErrorException($message, 0, $severity, $file, $line);
+		});
 	}	
 
 }

@@ -10,6 +10,7 @@
  * 	php yzm make module test test ---创建test模块的同时并在该模块下创建test控制器
  * 	php yzm make controller test mytest ---在test模块下创建mytest的控制器
  * 	php yzm make model test mytest ---在test模块下创建mytest的模型
+ * 	php yzm make job test_job ---创建test_job队列文件
  *
  */
 
@@ -48,7 +49,7 @@ class make extends cli{
 		mkdir(APP_PATH.$module.DIRECTORY_SEPARATOR.'common'.DIRECTORY_SEPARATOR.'language');
 		self::empty_index(APP_PATH.$module.DIRECTORY_SEPARATOR.'common'.DIRECTORY_SEPARATOR.'language'.DIRECTORY_SEPARATOR);
 		if(isset($parameter[2])) self::controller($parameter);
-		
+		self::write('Module created successfully.', 'green');
 	}
 	
 
@@ -68,7 +69,8 @@ class make extends cli{
 		if(!is_file($file)) self::halt('controller file not existent.');
         $data = file_get_contents($file);
         $content = str_replace(array('{MODULE}', '{CONTROLLER}'), array($parameter[1], $parameter[2]), $data);
-        return @file_put_contents($controller_file, $content);
+        $len = @file_put_contents($controller_file, $content);
+		$len ? self::write('Controller created successfully.', 'green') : self::write('Controller created failed.', 'red');
 	}
 	
 
@@ -88,7 +90,30 @@ class make extends cli{
 		if(!is_file($file)) self::halt('model file not existent.');
         $data = file_get_contents($file);
         $content = str_replace('{MODEL}', $parameter[2], $data);
-        return @file_put_contents($model_file, $content);
+        $len = @file_put_contents($model_file, $content);
+		$len ? self::write('Model created successfully.', 'green') : self::write('Model created failed.', 'red');
+	}
+
+
+	/**
+     * 创建队列
+     */	
+	public function job() {
+
+		$parameter = self::$parameter;
+		$job = $parameter[1];
+		$job_file = YZMPHP_PATH.'jobs'.DIRECTORY_SEPARATOR.$job.EXT;
+		if(is_file($job_file)) self::halt($job.' already existed.');
+		is_dir(YZMPHP_PATH.'jobs') || @mkdir(YZMPHP_PATH.'jobs', 0755);
+		
+		$file = CLI_PATH.'tpl'.DIRECTORY_SEPARATOR.'job.class.tpl';
+		if(!is_file($file)) self::halt('job file not existent.');
+		self::empty_index(YZMPHP_PATH.'jobs'.DIRECTORY_SEPARATOR);
+        $data = file_get_contents($file);
+        $content = str_replace(array('{JOB}'), array($parameter[1]), $data);
+        $len = @file_put_contents($job_file, $content);
+		$len ? self::write('Job created successfully.', 'green') : self::write('Job created failed.', 'red');
+		
 	}
 	
 	
