@@ -150,6 +150,10 @@ class db_pdo{
 			$this->key = array();
 			return $statement;
 		}catch (PDOException $e){
+			if (strpos($e->getMessage(), 'server has gone away') !== false) {
+		        self::$db_link[0]['db'] = self::$link = self::connect();
+		        return $this->execute($sql);
+		    }
 			$this->geterr('Execute SQL error, message : '.$e->getMessage(), $sql);
 		}
 	}
@@ -472,9 +476,12 @@ class db_pdo{
 	 * 获取错误提示
 	 */		
 	private function geterr($msg, $sql=''){
+	    if(PHP_SAPI == 'cli'){
+	    	throw new Exception('MySQL Error: '.$msg.' | '.$sql);
+	    }
+		
 		if(APP_DEBUG){
 			if(is_ajax()) return_json(array('status'=>0, 'message'=>'MySQL Error: '.$msg.' | '.$sql));
-			if(PHP_SAPI == 'cli') exit('MySQL Error: '.$msg.' | '.$sql);
 			application::fatalerror($msg, $sql, 2);	
 		}else{
 			write_error_log(array('MySQL Error', $msg, $sql));

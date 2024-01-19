@@ -177,7 +177,7 @@ function get_url() {
 
 /**
  * 获取请求ip
- * @return ip地址
+ * @return string
  */
 function getip(){
 	if(getenv('HTTP_CLIENT_IP') && strcasecmp(getenv('HTTP_CLIENT_IP'), 'unknown')) {
@@ -433,7 +433,7 @@ function is_mobile($mobile) {
 /**
  * 检测输入中是否含有错误字符
  *
- * @param char $string 要检查的字符串名称
+ * @param string $string 要检查的字符串名称
  * @return TRUE or FALSE
  */
 function is_badword($string) {
@@ -450,7 +450,7 @@ function is_badword($string) {
 /**
  * 检查用户名是否符合规定
  *
- * @param STRING $username 要检查的用户名
+ * @param string $username 要检查的用户名
  * @return 	TRUE or FALSE
  */
 function is_username($username) {
@@ -617,7 +617,7 @@ function sizecount($size, $prec = 2) {
 
 /**
  * 对数据进行编码转换
- * @param array/string $data       数组
+ * @param array|string $data       数组或字符串
  * @param string $input     需要转换的编码
  * @param string $output    转换后的编码
  */
@@ -1161,6 +1161,32 @@ function template($module = '', $template = 'index', $theme = ''){
 		file_put_contents($template_c, $compile);
 	}
 	return $template_c;
+}
+
+
+/**
+ * 下发队列任务
+ * @param  string $job    队列任务类名称
+ * @param  array  $params 传入的参数
+ * @param  string $queue  队列名称
+ * @return string|false   任务id
+ */
+function dispatch($job, $params = array(), $queue = ''){
+    $res = yzm_base::load_job($job, 0);
+    if(!$res) return $res;
+
+    $object = new $job($params);
+    yzm_base::load_sys_class('queue_factory','',0);
+
+    $data = array(
+        'uuid' => md5(create_randomstr()),
+        'job' => $job,
+        'object' => serialize($object),
+        'attempts' => 0,
+        'create_time' => SYS_TIME
+    );
+    queue_factory::get_instance()->lpush($queue ? $queue : trim(C('queue_name')), $data);
+    return $data['uuid'];
 }
 
 

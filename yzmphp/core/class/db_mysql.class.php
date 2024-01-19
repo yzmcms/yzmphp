@@ -128,12 +128,20 @@ class db_mysql{
 	 * @return 查询资源句柄
 	 */
 	private function execute($sql) {
-		$sql_start_time = microtime(true);
-		$this->lastsql = $sql;
-		$res = mysql_query($sql) or $this->geterr($sql);
-		$this->key = array();
-		APP_DEBUG && debug::addmsg($sql, 1, $sql_start_time);
-		return $res;
+		try{
+			$sql_start_time = microtime(true);
+			$this->lastsql = $sql;
+			$res = mysql_query($sql) or $this->geterr($sql);
+			$this->key = array();
+			APP_DEBUG && debug::addmsg($sql, 1, $sql_start_time);
+			return $res;
+		}catch (Exception $e){
+			if (strpos($e->getMessage(), 'server has gone away') !== false) {
+		        self::$db_link[0]['db'] = self::$link = self::connect();
+		        return $this->execute($sql);
+		    }
+			$this->geterr('Execute SQL error, message : '.$e->getMessage(), $sql);
+		}
 	}	
 	
 
@@ -455,10 +463,13 @@ class db_mysql{
 	/**
 	 * 获取错误提示
 	 */		
-	private function geterr($msg = ''){
+	private function geterr($msg, $sql=''){
+		if(PHP_SAPI == 'cli'){
+			throw new Exception('MySQL Error: '.mysql_error().' | '.$msg);
+		}
+		
 		if(APP_DEBUG){
 			if(is_ajax()) return_json(array('status'=>0, 'message'=>'MySQL Error: '.mysql_error().' | '.$msg));
-			if(PHP_SAPI == 'cli') exit('MySQL Error: '.mysql_error().' | '.$msg);
 			application::fatalerror($msg, mysql_error(), 2);	
 		}else{
 			write_error_log(array('MySQL Error', mysql_errno(), mysql_error(), $msg));

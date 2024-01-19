@@ -177,5 +177,17 @@ class yzm_base {
 		if (empty($m)) return false;
 		return self::_load_class($classname, APP_PATH.$m.DIRECTORY_SEPARATOR.'model', $initialize);
 	}
+	
+	
+	/**
+	 * 加载队列处理器
+	 * @param string $classname 控制器名
+	 * @param intger $initialize 是否初始化
+	 * @return object or true
+	 */
+	public static function load_job($classname, $initialize = 1) {
+
+		return self::_load_class($classname, YZMPHP_PATH.'jobs', $initialize);
+	}
 
 }
