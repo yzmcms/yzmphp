@@ -1057,23 +1057,16 @@ function L($language = '', $module = ''){
 
 /**
  * 打印各种类型的数据，调试程序时使用。
- * @param mixed $var 变量
- * @param boolean $echo 是否输出 默认为true 如果为false 则返回输出字符串
- * @return void or string
+ * @param mixed $var 变量，支持传入多个
+ * @return null
  */
-function P($var, $echo=true){
-	ob_start();
-    var_dump($var);
-    $output = ob_get_clean();
-	if(!extension_loaded('xdebug')){
-		$output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
-		$output = '<pre>' .  htmlspecialchars($output, ENT_QUOTES) . '</pre>';
-    }
-	if($echo){
-        echo $output;
-        return null;
-    }else
-        return $output;
+function P($var){
+	foreach(func_get_args() as $value){
+		echo '<pre style="background:#18171B;color:#EBEBEB;border-radius:3px;padding:5px 8px;margin:8px 0;font:12px Menlo, Monaco, Consolas, monospace;word-wrap:break-word;white-space:pre-wrap">';
+		var_dump($value);
+		echo '</pre>';
+	}
+	return null;
 }
 
 
