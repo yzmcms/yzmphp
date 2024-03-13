@@ -197,7 +197,7 @@ class image {
 
 		if($type=='jpg' || $type=='jpeg') imageinterlace($thumbimg, $this->interlace);
 		$imagefun = 'image'.($type=='jpg' ? 'jpeg' : $type);
-		if(empty($filename)) $filename  = substr($image, 0, strrpos($image, '.')).$suffix.'.'.$type;
+		if(empty($filename)) $filename  = substr($image, 0, strrpos($image, '.')).'.'.$type;
 		$imagefun($thumbimg, $filename);
 		imagedestroy($thumbimg);
 		imagedestroy($srcimg);

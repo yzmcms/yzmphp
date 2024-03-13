@@ -50,6 +50,7 @@ function https_request($url, $data = '', $array = true, $timeout = 2000, $header
  * @param $length 截取长度
  * @param $dot	  截取之后用什么表示
  * @param $code	  编码格式，支持UTF8/GBK
+ * @return string
  */
 function str_cut($string, $length, $dot = '...', $code = 'utf-8') {
 	$strlen = strlen($string);
@@ -165,6 +166,7 @@ function safe_replace($string) {
 
 /**
  * 获取当前页面完整URL地址
+ * @return string
  */
 function get_url() {
 	$sys_protocal = is_ssl() ? 'https://' : 'http://';
@@ -215,7 +217,7 @@ function get_address($ip, $is_array = false){
  * 检查IP是否匹配
  * @param  $ip_vague 要检查的IP或IP段，IP段(*)表示
  * @param  $ip       被检查IP
- * @return boolean
+ * @return bool
  */
 function check_ip_matching($ip_vague, $ip = ''){
 	empty($ip) && $ip = getip();
@@ -236,7 +238,6 @@ function check_ip_matching($ip_vague, $ip = ''){
 
 /**
 * 产生随机字符串
-*
 * @param    int        $length  输出长度
 * @param    string     $chars   可选的 ，默认为 0123456789
 * @return   string     字符串
@@ -263,7 +264,6 @@ function create_randomstr($lenth = 6) {
 
 /**
 * 创建订单号
-*
 * @return   string     字符串
 */
 function create_tradenum(){
@@ -315,6 +315,7 @@ function new_html_special_chars($string, $filter = array()) {
  * @param  array   $array
  * @param  integer $options
  * @param  integer $depth 
+ * @return string|false
  */
 function new_json_encode($array, $options = 0, $depth = 0){
 	if(version_compare(PHP_VERSION,'5.4.0','<')) {
@@ -330,7 +331,7 @@ function new_json_encode($array, $options = 0, $depth = 0){
  * 转义 javascript 代码标记
  *
  * @param $str
- * @return mixed
+ * @return string
  */
 function trim_script($str) {
 	if(is_array($str)){
@@ -414,6 +415,7 @@ function yzm_array_column($array, $column_key, $index_key = null){
 /**
  * 判断email格式是否正确
  * @param $email
+ * @return bool
  */
 function is_email($email) {
 	if(!is_string($email)) return false;
@@ -424,6 +426,7 @@ function is_email($email) {
 /**
  * 判断手机格式是否正确
  * @param $mobile
+ * @return bool
  */
 function is_mobile($mobile) {
 	return is_string($mobile) && preg_match('/1[3456789]{1}\d{9}$/',$mobile);
@@ -434,7 +437,7 @@ function is_mobile($mobile) {
  * 检测输入中是否含有错误字符
  *
  * @param string $string 要检查的字符串名称
- * @return TRUE or FALSE
+ * @return bool
  */
 function is_badword($string) {
 	$badwords = array("\\",'&',' ',"'",'"','/','*',',','<','>',"\r","\t","\n","#");
@@ -451,7 +454,7 @@ function is_badword($string) {
  * 检查用户名是否符合规定
  *
  * @param string $username 要检查的用户名
- * @return 	TRUE or FALSE
+ * @return 	boolean
  */
 function is_username($username) {
 	if(!is_string($username)) return false;
@@ -479,7 +482,7 @@ function is_username($username) {
  * 检查密码长度是否符合规定
  *
  * @param STRING $password
- * @return 	TRUE or FALSE
+ * @return 	boolean
  */
 function is_password($password) {
 	$strlen = is_string($password) ? strlen($password) : 0;
@@ -492,7 +495,7 @@ function is_password($password) {
  * 取得文件扩展
  *
  * @param $filename 文件名
- * @return 扩展名
+ * @return string
  */
 function fileext($filename) {
 	return strtolower(trim(substr(strrchr($filename, '.'), 1, 10)));
@@ -501,6 +504,7 @@ function fileext($filename) {
 
 /**
  * 是否为图片格式
+ * @return bool
  */
 function is_img($ext) {
 	return in_array(strtolower($ext), array('png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'ico'));
@@ -510,6 +514,7 @@ function is_img($ext) {
 
 /**
  * IE浏览器判断
+ * @return bool
  */
 function is_ie() {
 	$useragent = strtolower($_SERVER['HTTP_USER_AGENT']);
@@ -543,6 +548,7 @@ function is_utf8($string) {
  * 文件下载
  * @param $filepath 文件路径
  * @param $filename 文件名称
+ * @return null
  */
 function file_down($filepath, $filename = '') {
 	if(!$filename) $filename = basename($filepath);
@@ -620,6 +626,7 @@ function sizecount($size, $prec = 2) {
  * @param array|string $data       数组或字符串
  * @param string $input     需要转换的编码
  * @param string $output    转换后的编码
+ * @return string|array
  */
 function array_iconv($data, $input = 'gbk', $output = 'utf-8') {
 	if (!is_array($data)) {
@@ -822,7 +829,7 @@ function watermark($source, $target = '') {
 
 /**
  * 以httponly方式开启SESSION
- * @return boolean
+ * @return bool
  */
 function new_session_start(){
 	// session_save_path(YZMPHP_PATH.'cache/sessions');
@@ -856,6 +863,7 @@ function set_cookie($name, $value = '', $time = 0, $httponly = false) {
  * 获取 cookie
  * @param string $name     	  变量名，如果没有传参，则获取所有cookie
  * @param string $default     默认值，当值不存在时，获取该值
+ * @return string
  */
 function get_cookie($name = '', $default = '') {
 	if(!$name) return $_COOKIE;
@@ -875,6 +883,7 @@ function get_cookie($name = '', $default = '') {
 /**
  * 删除 cookie
  * @param string $name     变量名，如果没有传参，则删除所有cookie
+ * @return bool
  */
 function del_cookie($name = '') {	
 	if(!$name){
@@ -888,6 +897,7 @@ function del_cookie($name = '') {
 		setcookie($name, '', SYS_TIME - 3600, C('cookie_path'), C('cookie_domain'), C('cookie_secure'), C('cookie_httponly'));
 		unset($_COOKIE[$name]);
 	}
+	return true;
 }
 
 
@@ -1072,6 +1082,7 @@ function P($var){
 
 /**
  * 用于临时屏蔽debug信息
+ * @return null
  */	
 function debug(){
 	defined('DEBUG_HIDDEN') or define('DEBUG_HIDDEN', true);
@@ -1080,6 +1091,7 @@ function debug(){
 
 /**
  * 用于设置模块的主题
+ * @return null
  */	
 function set_module_theme($theme = 'default'){
 	defined('MODULE_THEME') or define('MODULE_THEME', $theme);
@@ -1283,6 +1295,7 @@ function send_http_status($code){
 /**
  * 生成验证key
  * @param $prefix   前缀
+ * @return string
  */
 function make_auth_key($prefix) {
 	return md5($prefix.YZMPHP_PATH.C('auth_key'));
@@ -1417,7 +1430,7 @@ function input($key = '', $default = '', $function = ''){
 
 /**
  * 判断是否SSL协议
- * @return boolean
+ * @return bool
  */
 function is_ssl() {
     if(isset($_SERVER['HTTPS']) && ('1' == $_SERVER['HTTPS'] || 'on' == strtolower($_SERVER['HTTPS']))){
